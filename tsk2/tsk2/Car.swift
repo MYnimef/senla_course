@@ -10,22 +10,12 @@ import Foundation
 
 struct CarAttributes {
     
-    var wheelsNum: Int
-    var doorsNum: Int
-
-    init(wheelsNum: Int, doorsNum: Int) {
-        self.wheelsNum = wheelsNum
-        self.doorsNum = doorsNum
-    }
-
-    init() {
-        wheelsNum = 0
-        doorsNum = 0
-    }
+    var wheelsNum: Int = 0
+    var doorsNum: Int = 0
 }
 
 
-struct CarSize {
+struct CarPhysicalCpecs {
     
     let weight: Double
     let width: Double
@@ -34,6 +24,13 @@ struct CarSize {
     var volume: Double {
         width * length * height
     }
+}
+
+struct CarEngine: Equatable {
+    
+    var name: String = ""
+    var maxSpeed: Double = 0
+    var velocity: Double = 0
 }
 
 
@@ -46,57 +43,35 @@ enum CarState {
 }
 
 
-class Car: NSCopying {
+class Car {
 
     let modelName: String
 
-    let size: CarSize
+    let size: CarPhysicalCpecs
     
     let defaultAttributes: CarAttributes
     var actualAttributes: CarAttributes
 
-    let defaultEngine: String
-    var actualEngine: String
-
-    private let specialAction: () -> ()
+    let defaultEngine: CarEngine
+    var actualEngine: CarEngine
     
     var state: CarState
     
+    var factoryName: String?
+    
     init(
             modelName: String,
-            size: CarSize,
-            engine: String,
-            attributes: CarAttributes,
-            specialAction: @escaping () -> ()
+            size: CarPhysicalCpecs,
+            engine: CarEngine,
+            attributes: CarAttributes
     ) {
         self.modelName = modelName
         self.size = size
         defaultEngine = engine
-        actualEngine = ""
+        actualEngine = CarEngine()
         defaultAttributes = attributes
         actualAttributes = CarAttributes()
-        self.specialAction = specialAction
         state = .settingUp
-    }
-
-    init(
-            modelName: String,
-            size: CarSize,
-            defaultAttributes: CarAttributes,
-            actualAttributes: CarAttributes,
-            defaultEngine: String,
-            actualEngine: String,
-            specialAction: @escaping () -> (),
-            state: CarState
-    ) {
-        self.modelName = modelName
-        self.size = size
-        self.defaultAttributes = defaultAttributes
-        self.actualAttributes = actualAttributes
-        self.defaultEngine = defaultEngine
-        self.actualEngine = actualEngine
-        self.specialAction = specialAction
-        self.state = state
     }
 
     func assemble() {
@@ -105,23 +80,9 @@ class Car: NSCopying {
         state = .working
     }
 
-    func crash() {
-        state = .broken
-    }
-
-    func crash(doorsAmount: Int) {
-        actualAttributes.doorsNum = doorsAmount
-        state = .broken
-    }
-
-    func crash(wheelsAmount: Int) {
-        actualAttributes.wheelsNum = wheelsAmount
-        state = .broken
-    }
-
-    func crash(doorsAmount: Int, wheelsAmount: Int) {
-        actualAttributes.doorsNum = doorsAmount
-        actualAttributes.wheelsNum = wheelsAmount
+    func crash(doorsDecrease: Int = 0, wheelsDecrease: Int = 0) {
+        actualAttributes.doorsNum -= doorsDecrease
+        actualAttributes.wheelsNum -= wheelsDecrease
         state = .broken
     }
 
@@ -134,104 +95,99 @@ class Car: NSCopying {
         }
     }
 
-    func modifyEngine(newEngine: String) {
+    func modifyEngine(newEngine: CarEngine) {
         actualEngine = newEngine
         state = .modified
     }
-
-    func action() {
-        specialAction()
-    }
-
-    func copy(with zone: NSZone? = nil) -> Any {
-        return Car(
-                modelName: modelName,
-                size: size,
-                defaultAttributes: defaultAttributes,
-                actualAttributes: actualAttributes,
-                defaultEngine: defaultEngine,
-                actualEngine: actualEngine,
-                specialAction: specialAction,
-                state: state
-        )
+    
+    func modifyEngine(speedIncrease: Double = 0, velocityIncrease: Double = 0) {
+        actualEngine.maxSpeed += speedIncrease
+        actualEngine.velocity += velocityIncrease
+        state = .modified
     }
 }
 
 
 class Sedan: Car {
 
-    init(modelName: String, size: CarSize, engine: String) {
+    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
         super.init(
                 modelName: modelName,
                 size: size,
                 engine: engine,
-                attributes: CarAttributes(wheelsNum: 4, doorsNum: 2),
-                specialAction: {
-                    print("This car is perfect for mafia")
-                }
+                attributes: CarAttributes(wheelsNum: 4, doorsNum: 2)
         )
+    }
+    
+    func transportMafia() {
+        print("Don Craleone has arrived")
     }
 }
 
 
 class Minivan: Car {
 
-    init(modelName: String, size: CarSize, engine: String) {
+    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
         super.init(
                 modelName: modelName,
                 size: size,
                 engine: engine,
-                attributes: CarAttributes(wheelsNum: 4, doorsNum: 4),
-                specialAction: {
-                    print("This car is perfect for family")
-                }
+                attributes: CarAttributes(wheelsNum: 4, doorsNum: 4)
         )
+    }
+    
+    func goForVacation() {
+        print("This car is perfect for family")
     }
 }
 
 
 class PickUp: Car {
 
-    init(modelName: String, size: CarSize, engine: String) {
+    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
         super.init(
                 modelName: modelName,
                 size: size,
                 engine: engine,
-                attributes: CarAttributes(wheelsNum: 4, doorsNum: 2),
-                specialAction: {
-                    print("This car is perfect for transporting some things")
-                }
+                attributes: CarAttributes(wheelsNum: 4, doorsNum: 2)
         )
+    }
+    
+    func turnOnCountryMusic() {
+        print("Sweet home Alabama")
     }
 }
 
 
 class SportCar: Car {
 
-    init(modelName: String, size: CarSize, engine: String) {
+    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
         super.init(
-                modelName: modelName,
-                size: size,
-                engine: engine,
-                attributes: CarAttributes(wheelsNum: 4, doorsNum: 2),
-                specialAction: {
-                    print("This car is really fast")
-                }
+            modelName: modelName,
+            size: size,
+            engine: engine,
+            attributes: CarAttributes(wheelsNum: 4, doorsNum: 2)
         )
+    }
+    
+    func driveFast() {
+        print("it was too fast")
     }
 }
 
 
 class SuperCar: Car {
-    init(modelName: String, size: CarSize, engine: String) {
+    
+    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
         super.init(
-                modelName: modelName,
-                size: size,
-                engine: engine,
-                attributes: CarAttributes(wheelsNum: 4, doorsNum: 2),
-                specialAction: {
-                    print("This is a luxury car for the best")
-                }
+            modelName: modelName,
+            size: size,
+            engine: engine,
+            attributes: CarAttributes(wheelsNum: 4, doorsNum: 2)
         )
+    }
+    
+    func fastAndFurious() {
+        print("Family.")
     }
 }

@@ -5,62 +5,93 @@
 import Foundation
 
 
-struct FactoryCars {
-    static let audiS3 = SportCar(
-            modelName: "Audi S3 Sportback",
-            size: CarSize(weight: 1500, width: 1816, length: 4351, height: 1816),
-            engine: "TFSI"
-    )
-    static let bmwX5 = SuperCar(
-            modelName: "BMW X5",
-            size: CarSize(weight: 1550, width: 1806, length: 4651, height: 1916),
-            engine: "XXXI"
-    )
-    static let tomcat = PickUp(
-            modelName: "Tomcat",
-            size: CarSize(weight: 15000, width: 18160, length: 43510, height: 18160),
-            engine: "FURICH"
-    )
-    static let mercedes = Sedan(
-            modelName: "Mercedes",
-            size: CarSize(weight: 1500, width: 1816, length: 4351, height: 1816),
-            engine: "WRUM"
-    )
-}
-
-
 class Factory {
-    private var cars: [Car]
-
-    init() {
-        cars = []
+    
+    static var madeCars: Int = 0
+    
+    private var sedanCars: [Sedan] = []
+    private var minivanCars: [Minivan] = []
+    private var pickupCars: [PickUp] = []
+    private var sportCars: [SportCar] = []
+    private var superCars: [SuperCar] = []
+    
+    let factoryName: String
+    
+    init(factoryName: String) {
+        self.factoryName = factoryName
     }
 
     func getCarsFromFactory() -> [Car] {
-        let carList = cars
-        cars = []
+        let carList: [Car] = sedanCars + minivanCars + pickupCars + sportCars + superCars
+        sedanCars.removeAll()
+        minivanCars.removeAll()
+        pickupCars.removeAll()
+        sportCars.removeAll()
+        superCars.removeAll()
         return carList
     }
-
-    func startMakingAudi() {
-        cars.append(FactoryCars.audiS3.copy() as! Car)
+    
+    func makeCar(_ car: Sedan) {
+        sedanCars.append(car)
     }
-
-    func startMakingBmw() {
-        cars.append(FactoryCars.bmwX5.copy() as! Car)
+    
+    func makeCar(_ car: Minivan) {
+        minivanCars.append(car)
     }
-
-    func startMakingTomcat() {
-        cars.append(FactoryCars.tomcat.copy() as! Car)
+    
+    func makeCar(_ car: PickUp) {
+        pickupCars.append(car)
     }
-
-    func startMakingMercedes() {
-        cars.append(FactoryCars.mercedes.copy() as! Car)
+    
+    func makeCar(_ car: SportCar) {
+        sportCars.append(car)
     }
-
-    func makeAllCars() {
-        for car in cars {
-            car.assemble()
+    
+    func makeCar(_ car: SuperCar) {
+        superCars.append(car)
+    }
+    
+    func assemnleAllSedans() {
+        for car in sedanCars {
+            assemnleCar(car)
         }
+    }
+    
+    func assemnleAllMinivans() {
+        for car in minivanCars {
+            assemnleCar(car)
+        }
+    }
+    
+    func assemnleAllPickups() {
+        for car in pickupCars {
+            assemnleCar(car)
+        }
+    }
+    
+    func assemnleAllSportCars() {
+        for car in sportCars {
+            assemnleCar(car)
+        }
+    }
+    
+    func assemnleAllSuperCars() {
+        for car in superCars {
+            assemnleCar(car)
+        }
+    }
+    
+    func assemnleAllCars() {
+        assemnleAllSedans()
+        assemnleAllMinivans()
+        assemnleAllPickups()
+        assemnleAllSportCars()
+        assemnleAllSuperCars()
+    }
+    
+    private func assemnleCar(_ car: Car) {
+        car.assemble()
+        car.factoryName = factoryName
+        Factory.madeCars += 1
     }
 }
