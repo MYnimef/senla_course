@@ -5,8 +5,6 @@
 //  Created by Ivan Markov on 03.03.2022.
 //
 
-import Foundation
-
 
 let factory = Factory(factoryName: "АВТОВАЗ")
 

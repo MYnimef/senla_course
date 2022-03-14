@@ -2,10 +2,8 @@
 // Created by Ivan Markov on 04.03.2022.
 //
 
-import Foundation
 
-
-class Factory {
+final class Factory {
     
     static var madeCars: Int = 0
     

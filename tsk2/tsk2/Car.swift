@@ -5,8 +5,6 @@
 //  Created by Ivan Markov on 03.03.2022.
 //
 
-import Foundation
-
 
 struct Attributes {
     
@@ -24,6 +22,7 @@ struct CarAttributes {
         defaultAttributes = Attributes(wheelsNum: wheelsNum, doorsNum: doorsNum)
     }
     
+    //Static(Direct) Dispatch
     mutating func changeAttributes(wheelsNum: Int, doorsNum: Int) {
         if attributes != nil {
             attributes!.wheelsNum = wheelsNum
@@ -33,6 +32,7 @@ struct CarAttributes {
         }
     }
     
+    //Static(Direct) Dispatch
     mutating func changeAttributes(wheelsDecrease: Int, doorsDecrease: Int) {
         if attributes != nil {
             attributes!.wheelsNum -= wheelsDecrease
@@ -74,6 +74,7 @@ struct Engine {
         self.defaultCharacteristics = EngineCharacteristics(maxSpeed: maxSpeed, velocity: velocity)
     }
     
+    //Static(Direct) Dispatch
     mutating func upgradeEngine(speedIncrease: Double, velocityIncrease: Double) {
         if characteristics != nil {
             characteristics!.maxSpeed += speedIncrease
@@ -83,6 +84,7 @@ struct Engine {
         }
     }
     
+    //Static(Direct) Dispatch
     func checkForModifications() -> Bool {
         if defaultCharacteristics == characteristics {
             return true
@@ -110,10 +112,15 @@ protocol CarProtocol {
     var state: CarState { get set }
     var factoryName: String? { get set }
     
+    //Static(Direct) Dispatch
     mutating func assemble()
+    //Static(Direct) Dispatch
     mutating func crash(doorsDecrease: Int, wheelsDecrease: Int)
+    //Static(Direct) Dispatch
     mutating func repair()
+    //Static(Direct) Dispatch
     mutating func modifyEngine(newEngine: Engine)
+    //Static(Direct) Dispatch
     mutating func modifyEngine(speedIncrease: Double, velocityIncrease: Double)
 }
 
@@ -150,7 +157,9 @@ protocol SedanProtocol {
     
     var gunsAmount: Int { get set }
     
+    //Static(Direct) Dispatch
     func shootWithAllTheGuns()
+    //Static(Direct) Dispatch
     func transportMafia()
 }
 
@@ -186,7 +195,9 @@ protocol MinivanProtocol {
     var doesHaveDad: Bool { get set }
     var doesHaveMom: Bool { get set }
     
+    //Static(Direct) Dispatch
     func singASong()
+    //Static(Direct) Dispatch
     func goForVacation()
 }
 
@@ -225,6 +236,7 @@ struct Minivan: CarProtocol, MinivanProtocol {
 
 protocol PickupProtocol {
     
+    //Static(Direct) Dispatch
     func turnOnCountryMusic()
 }
 
@@ -250,6 +262,7 @@ struct PickUp: CarProtocol, PickupProtocol {
 
 protocol SportCarProtocol {
     
+    //Static(Direct) Dispatch
     func driveFast()
 }
 
@@ -275,6 +288,7 @@ struct SportCar: CarProtocol, SportCarProtocol {
 
 protocol SuperCarProtocol {
     
+    //Static(Direct) Dispatch
     func fastAndFurious()
 }
 
