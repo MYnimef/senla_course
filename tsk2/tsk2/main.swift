@@ -6,7 +6,8 @@
 //
 
 
-let factory = Factory(factoryName: "АВТОВАЗ")
+let diller = Diller()
+let factory = Factory(factoryName: "АВТОВАЗ", dillerDelegate: diller)
 
 factory.makeCar(PickUp(
     modelName: "Tomcat",
@@ -30,9 +31,7 @@ factory.makeCar(Sedan(
     gunsAmount: 5
 ))
 
-factory.assemnleAllCars()
-
-for car in factory.getCarsFromFactory() {
+for car in diller.getCars() {
     var madeBy: String
     if let factory = car.factoryName {
         madeBy = "made by " + factory
