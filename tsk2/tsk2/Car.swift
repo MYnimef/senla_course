@@ -8,14 +8,43 @@
 import Foundation
 
 
-struct CarAttributes {
+struct Attributes {
     
     var wheelsNum: Int = 0
     var doorsNum: Int = 0
 }
 
 
-struct CarPhysicalCpecs {
+struct CarAttributes {
+    
+    let defaultAttributes: Attributes
+    var attributes: Attributes?
+    
+    init(wheelsNum: Int, doorsNum: Int) {
+        defaultAttributes = Attributes(wheelsNum: wheelsNum, doorsNum: doorsNum)
+    }
+    
+    mutating func changeAttributes(wheelsNum: Int, doorsNum: Int) {
+        if attributes != nil {
+            attributes!.wheelsNum = wheelsNum
+            attributes!.doorsNum = doorsNum
+        } else {
+            attributes = Attributes(wheelsNum: wheelsNum, doorsNum: doorsNum)
+        }
+    }
+    
+    mutating func changeAttributes(wheelsDecrease: Int, doorsDecrease: Int) {
+        if attributes != nil {
+            attributes!.wheelsNum -= wheelsDecrease
+            attributes!.doorsNum -= doorsDecrease
+        } else {
+            print("Can't decrease not finished car")
+        }
+    }
+}
+
+
+struct PhysicalCpecs {
     
     let weight: Double
     let width: Double
@@ -26,11 +55,40 @@ struct CarPhysicalCpecs {
     }
 }
 
-struct CarEngine: Equatable {
+
+struct EngineCharacteristics: Equatable {
     
-    var name: String = ""
-    var maxSpeed: Double = 0
-    var velocity: Double = 0
+    var maxSpeed: Double
+    var velocity: Double
+}
+
+
+struct Engine {
+    
+    var name: String
+    let defaultCharacteristics: EngineCharacteristics
+    var characteristics: EngineCharacteristics?
+    
+    init(name: String, maxSpeed: Double, velocity: Double) {
+        self.name = name
+        self.defaultCharacteristics = EngineCharacteristics(maxSpeed: maxSpeed, velocity: velocity)
+    }
+    
+    mutating func upgradeEngine(speedIncrease: Double, velocityIncrease: Double) {
+        if characteristics != nil {
+            characteristics!.maxSpeed += speedIncrease
+            characteristics!.velocity += velocityIncrease
+        } else {
+            print("Can't upgrade not finished engine")
+        }
+    }
+    
+    func checkForModifications() -> Bool {
+        if defaultCharacteristics == characteristics {
+            return true
+        }
+        return false
+    }
 }
 
 
@@ -43,80 +101,64 @@ enum CarState {
 }
 
 
-class Car {
-
-    let modelName: String
-
-    let size: CarPhysicalCpecs
+protocol CarProtocol {
     
-    let defaultAttributes: CarAttributes
-    var actualAttributes: CarAttributes
+    var modelName: String { get }
+    var physicalSpecs: PhysicalCpecs { get }
+    var attributes: CarAttributes { get set }
+    var engine: Engine { get set }
+    var state: CarState { get set }
+    var factoryName: String? { get set }
+    
+    mutating func assemble()
+    mutating func crash(doorsDecrease: Int, wheelsDecrease: Int)
+    mutating func repair()
+    mutating func modifyEngine(newEngine: Engine)
+    mutating func modifyEngine(speedIncrease: Double, velocityIncrease: Double)
+}
 
-    let defaultEngine: CarEngine
-    var actualEngine: CarEngine
-    
-    var state: CarState
-    
-    var factoryName: String?
-    
-    init(
-            modelName: String,
-            size: CarPhysicalCpecs,
-            engine: CarEngine,
-            attributes: CarAttributes
-    ) {
-        self.modelName = modelName
-        self.size = size
-        defaultEngine = engine
-        actualEngine = CarEngine()
-        defaultAttributes = attributes
-        actualAttributes = CarAttributes()
-        state = .settingUp
-    }
 
-    func assemble() {
-        actualAttributes = defaultAttributes
-        actualEngine = defaultEngine
+extension CarProtocol {
+
+    mutating func assemble() {
         state = .working
     }
 
-    func crash(doorsDecrease: Int = 0, wheelsDecrease: Int = 0) {
-        actualAttributes.doorsNum -= doorsDecrease
-        actualAttributes.wheelsNum -= wheelsDecrease
+    mutating func crash(doorsDecrease: Int = 0, wheelsDecrease: Int = 0) {
+        attributes.changeAttributes(wheelsDecrease: wheelsDecrease, doorsDecrease: doorsDecrease)
         state = .broken
     }
 
-    func repair() {
-        actualAttributes = defaultAttributes
-        if actualEngine == defaultEngine {
-            state = .working
-        } else {
-            state = .modified
-        }
+    mutating func repair() {
+        attributes.attributes = attributes.defaultAttributes
+        state = engine.checkForModifications() ? .modified : .working
     }
 
-    func modifyEngine(newEngine: CarEngine) {
-        actualEngine = newEngine
+    mutating func modifyEngine(newEngine: Engine) {
+        engine = newEngine
         state = .modified
     }
     
-    func modifyEngine(speedIncrease: Double = 0, velocityIncrease: Double = 0) {
-        actualEngine.maxSpeed += speedIncrease
-        actualEngine.velocity += velocityIncrease
+    mutating func modifyEngine(speedIncrease: Double = 0, velocityIncrease: Double = 0) {
+        engine.upgradeEngine(speedIncrease: speedIncrease, velocityIncrease: velocityIncrease)
         state = .modified
     }
 }
 
 
-class Sedan: Car {
+protocol SedanProtocol {
+    
+    var gunsAmount: Int { get set }
+    
+    func shootWithAllTheGuns()
+    func transportMafia()
+}
 
-    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
-        super.init(
-                modelName: modelName,
-                size: size,
-                engine: engine,
-                attributes: CarAttributes(wheelsNum: 4, doorsNum: 2)
-        )
+
+extension SedanProtocol {
+    
+    func shootWithAllTheGuns() {
+        print("Shooting our enemy from all of the \(gunsAmount) guns")
     }
     
     func transportMafia() {
@@ -125,14 +167,38 @@ class Sedan: Car {
 }
 
 
-class Minivan: Car {
+struct Sedan: CarProtocol, SedanProtocol {
+    
+    var modelName: String
+    var physicalSpecs: PhysicalCpecs
+    var attributes = CarAttributes(wheelsNum: 4, doorsNum: 4)
+    var engine: Engine
+    var state: CarState = .settingUp
+    var factoryName: String?
+    
+    var gunsAmount: Int
+}
 
-    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
-        super.init(
-                modelName: modelName,
-                size: size,
-                engine: engine,
-                attributes: CarAttributes(wheelsNum: 4, doorsNum: 4)
+
+protocol MinivanProtocol {
+    
+    var familyMembersAmount: Int { get set }
+    var doesHaveDad: Bool { get set }
+    var doesHaveMom: Bool { get set }
+    
+    func singASong()
+    func goForVacation()
+}
+
+
+extension MinivanProtocol {
+    
+    func singASong() {
+        print(
+            "\(familyMembersAmount == 0 ? "We don't exist, this song is a" : "We") ride to the trip" + "\n" +
+            "Where \(familyMembersAmount == 0 ? "noone" : "we") are gonna have a good time" + "\n" +
+            "Our dad is + \(doesHaveDad ? "so strong" : "dead")" + "\n" +
+            "And our mom is + \(doesHaveMom ? "so beautiful" : "is a 🙊")"
         )
     }
     
@@ -142,16 +208,28 @@ class Minivan: Car {
 }
 
 
-class PickUp: Car {
+struct Minivan: CarProtocol, MinivanProtocol {
+    
+    var modelName: String
+    var physicalSpecs: PhysicalCpecs
+    var attributes = CarAttributes(wheelsNum: 4, doorsNum: 4)
+    var engine: Engine
+    var state: CarState = .settingUp
+    var factoryName: String?
+    
+    var familyMembersAmount: Int
+    var doesHaveDad: Bool
+    var doesHaveMom: Bool
+}
 
-    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
-        super.init(
-                modelName: modelName,
-                size: size,
-                engine: engine,
-                attributes: CarAttributes(wheelsNum: 4, doorsNum: 2)
-        )
-    }
+
+protocol PickupProtocol {
+    
+    func turnOnCountryMusic()
+}
+
+
+extension PickupProtocol {
     
     func turnOnCountryMusic() {
         print("Sweet home Alabama")
@@ -159,16 +237,24 @@ class PickUp: Car {
 }
 
 
-class SportCar: Car {
+struct PickUp: CarProtocol, PickupProtocol {
+    
+    var modelName: String
+    var physicalSpecs: PhysicalCpecs
+    var attributes = CarAttributes(wheelsNum: 4, doorsNum: 2)
+    var engine: Engine
+    var state: CarState = .settingUp
+    var factoryName: String?
+}
 
-    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
-        super.init(
-            modelName: modelName,
-            size: size,
-            engine: engine,
-            attributes: CarAttributes(wheelsNum: 4, doorsNum: 2)
-        )
-    }
+
+protocol SportCarProtocol {
+    
+    func driveFast()
+}
+
+
+extension SportCarProtocol {
     
     func driveFast() {
         print("it was too fast")
@@ -176,18 +262,37 @@ class SportCar: Car {
 }
 
 
-class SuperCar: Car {
+struct SportCar: CarProtocol, SportCarProtocol {
     
-    init(modelName: String, size: CarPhysicalCpecs, engine: CarEngine) {
-        super.init(
-            modelName: modelName,
-            size: size,
-            engine: engine,
-            attributes: CarAttributes(wheelsNum: 4, doorsNum: 2)
-        )
-    }
+    var modelName: String
+    var physicalSpecs: PhysicalCpecs
+    var attributes = CarAttributes(wheelsNum: 4, doorsNum: 2)
+    var engine: Engine
+    var state: CarState = .settingUp
+    var factoryName: String?
+}
+
+
+protocol SuperCarProtocol {
+    
+    func fastAndFurious()
+}
+
+
+extension SuperCarProtocol {
     
     func fastAndFurious() {
         print("Family.")
     }
+}
+
+
+struct SuperCar: CarProtocol, SuperCarProtocol {
+    
+    var modelName: String
+    var physicalSpecs: PhysicalCpecs
+    var attributes: CarAttributes = CarAttributes(wheelsNum: 4, doorsNum: 2)
+    var engine: Engine
+    var state: CarState = .settingUp
+    var factoryName: String?
 }

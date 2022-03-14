@@ -21,8 +21,8 @@ class Factory {
         self.factoryName = factoryName
     }
 
-    func getCarsFromFactory() -> [Car] {
-        let carList: [Car] = sedanCars + minivanCars + pickupCars + sportCars + superCars
+    func getCarsFromFactory() -> [CarProtocol] {
+        let carList: [CarProtocol] = sedanCars + minivanCars + pickupCars + sportCars + superCars
         sedanCars.removeAll()
         minivanCars.removeAll()
         pickupCars.removeAll()
@@ -52,33 +52,39 @@ class Factory {
     }
     
     func assemnleAllSedans() {
-        for car in sedanCars {
-            assemnleCar(car)
+        for i in 0..<sedanCars.count {
+            assemble(&sedanCars[i])
         }
     }
     
     func assemnleAllMinivans() {
-        for car in minivanCars {
-            assemnleCar(car)
+        for i in 0..<minivanCars.count {
+            assemble(&minivanCars[i])
         }
     }
     
     func assemnleAllPickups() {
-        for car in pickupCars {
-            assemnleCar(car)
+        for i in 0..<pickupCars.count {
+            assemble(&pickupCars[i])
         }
     }
     
     func assemnleAllSportCars() {
-        for car in sportCars {
-            assemnleCar(car)
+        for i in 0..<sportCars.count {
+            assemble(&sportCars[i])
         }
     }
     
     func assemnleAllSuperCars() {
-        for car in superCars {
-            assemnleCar(car)
+        for i in 0..<superCars.count {
+            assemble(&superCars[i])
         }
+    }
+    
+    private func assemble<T: CarProtocol>(_ car: inout T) {
+        car.assemble()
+        car.factoryName = factoryName
+        Factory.madeCars += 1
     }
     
     func assemnleAllCars() {
@@ -87,11 +93,5 @@ class Factory {
         assemnleAllPickups()
         assemnleAllSportCars()
         assemnleAllSuperCars()
-    }
-    
-    private func assemnleCar(_ car: Car) {
-        car.assemble()
-        car.factoryName = factoryName
-        Factory.madeCars += 1
     }
 }

@@ -12,23 +12,24 @@ let factory = Factory(factoryName: "АВТОВАЗ")
 
 factory.makeCar(PickUp(
     modelName: "Tomcat",
-    size: CarPhysicalCpecs(weight: 15000, width: 18160, length: 43510, height: 18160),
-    engine: CarEngine(name: "FURICH", maxSpeed: 100, velocity: 70)
+    physicalSpecs: PhysicalCpecs(weight: 15000, width: 18160, length: 43510, height: 18160),
+    engine: Engine(name: "FURICH", maxSpeed: 100, velocity: 70)
 ))
 factory.makeCar(SuperCar(
     modelName: "BMW X5",
-    size: CarPhysicalCpecs(weight: 1550, width: 1806, length: 4651, height: 1916),
-    engine: CarEngine(name: "XXXI", maxSpeed: 200, velocity: 100)
+    physicalSpecs: PhysicalCpecs(weight: 1550, width: 1806, length: 4651, height: 1916),
+    engine: Engine(name: "XXXI", maxSpeed: 200, velocity: 100)
 ))
 factory.makeCar(SportCar(
     modelName: "Audi S3 Sportback",
-    size: CarPhysicalCpecs(weight: 1500, width: 1816, length: 4351, height: 1816),
-    engine: CarEngine(name: "TFSI", maxSpeed: 150, velocity: 90)
+    physicalSpecs: PhysicalCpecs(weight: 1500, width: 1816, length: 4351, height: 1816),
+    engine: Engine(name: "TFSI", maxSpeed: 150, velocity: 90)
 ))
 factory.makeCar(Sedan(
     modelName: "Mercedes",
-    size: CarPhysicalCpecs(weight: 1500, width: 1816, length: 4351, height: 1816),
-    engine: CarEngine(name: "WRUM", maxSpeed: 120, velocity: 80)
+    physicalSpecs: PhysicalCpecs(weight: 1500, width: 1816, length: 4351, height: 1816),
+    engine: Engine(name: "WRUM", maxSpeed: 120, velocity: 80),
+    gunsAmount: 5
 ))
 
 factory.assemnleAllCars()
