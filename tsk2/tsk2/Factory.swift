@@ -13,36 +13,12 @@ class Factory {
     private var sportCars: [SportCar] = []
     private var superCars: [SuperCar] = []
     
-    private weak var delegate: DelegateProtocol?
+    weak var delegate: FactoryDelegate?
     
     let factoryName: String
     
     init(factoryName: String) {
         self.factoryName = factoryName
-    }
-    
-    func setDelegate(_ delegate: DelegateProtocol) {
-        sedanCars.forEach({ car in
-            delegate.addSedan(car)
-        })
-        sedanCars.removeAll()
-        minivanCars.forEach({ car in
-            delegate.addMinivan(car)
-        })
-        minivanCars.removeAll()
-        pickupCars.forEach({ car in
-            delegate.addPickup(car)
-        })
-        pickupCars.removeAll()
-        sportCars.forEach({ car in
-            delegate.addSportcar(car)
-        })
-        sportCars.removeAll()
-        superCars.forEach({ car in
-            delegate.addSupercar(car)
-        })
-        superCars.removeAll()
-        self.delegate = delegate
     }
     
     func makeMercedes() {
@@ -52,11 +28,13 @@ class Factory {
             engine: Engine(name: "WRUM", maxSpeed: 120, velocity: 80),
             gunsAmount: 5
         )
+        
         assemble(&car)
+        
+        sedanCars.append(car)
         if let dillerDelegate = delegate {
-            dillerDelegate.addSedan(car)
-        } else {
-            sedanCars.append(car)
+            dillerDelegate.factoryDidCreate(self, sedanCars)
+            sedanCars.removeAll()
         }
     }
     
@@ -66,11 +44,13 @@ class Factory {
             physicalSpecs: PhysicalCpecs(weight: 15000, width: 18160, length: 43510, height: 18160),
             engine: Engine(name: "FURICH", maxSpeed: 100, velocity: 70)
         )
+        
         assemble(&car)
+        
+        minivanCars.append(car)
         if let dillerDelegate = delegate {
-            dillerDelegate.addMinivan(car)
-        } else {
-            minivanCars.append(car)
+            dillerDelegate.factoryDidCreate(self, minivanCars)
+            minivanCars.removeAll()
         }
     }
     
@@ -80,11 +60,13 @@ class Factory {
             physicalSpecs: PhysicalCpecs(weight: 15000, width: 18160, length: 43510, height: 18160),
             engine: Engine(name: "FURICH", maxSpeed: 100, velocity: 70)
         )
+        
         assemble(&car)
+        
+        pickupCars.append(car)
         if let dillerDelegate = delegate {
-            dillerDelegate.addPickup(car)
-        } else {
-            pickupCars.append(car)
+            dillerDelegate.factoryDidCreate(self, pickupCars)
+            pickupCars.removeAll()
         }
     }
     
@@ -94,11 +76,13 @@ class Factory {
             physicalSpecs: PhysicalCpecs(weight: 1500, width: 1816, length: 4351, height: 1816),
             engine: Engine(name: "TFSI", maxSpeed: 150, velocity: 90)
         )
+        
         assemble(&car)
+        
+        sportCars.append(car)
         if let dillerDelegate = delegate {
-            dillerDelegate.addSportcar(car)
-        } else {
-            sportCars.append(car)
+            dillerDelegate.factoryDidCreate(self, sportCars)
+            sportCars.removeAll()
         }
     }
     
@@ -108,30 +92,30 @@ class Factory {
             physicalSpecs: PhysicalCpecs(weight: 1550, width: 1806, length: 4651, height: 1916),
             engine: Engine(name: "XXXI", maxSpeed: 200, velocity: 100)
         )
+        
         assemble(&car)
+        
+        superCars.append(car)
         if let dillerDelegate = delegate {
-            dillerDelegate.addSupercar(car)
-        } else {
-            superCars.append(car)
+            dillerDelegate.factoryDidCreate(self, superCars)
+            superCars.removeAll()
         }
     }
     
     private func assemble<T: CarProtocol>(_ car: inout T) {
         car.assemble()
-        car.factoryName = factoryName
         Factory.madeCars += 1
     }
 }
 
 
-protocol DelegateProtocol: AnyObject {
+protocol FactoryDelegate: AnyObject {
     
-    func getCars() -> [CarProtocol]
-    func addSedan(_ car: Sedan)
-    func addMinivan(_ car: Minivan)
-    func addPickup(_ car: PickUp)
-    func addSportcar(_ car: SportCar)
-    func addSupercar(_ car: SuperCar)
+    func factoryDidCreate(_ factory: Factory, _ cars: [Sedan])
+    func factoryDidCreate(_ factory: Factory, _ cars: [Minivan])
+    func factoryDidCreate(_ factory: Factory, _ cars: [PickUp])
+    func factoryDidCreate(_ factory: Factory, _ cars: [SportCar])
+    func factoryDidCreate(_ factory: Factory, _ cars: [SuperCar])
 }
 
 
@@ -142,30 +126,6 @@ class Diller {
     private var pickupCars: [PickUp] = []
     private var sportCars: [SportCar] = []
     private var superCars: [SuperCar] = []
-}
-
-
-extension Diller: DelegateProtocol {
-    
-    func addSedan(_ car: Sedan) {
-        sedanCars.append(car)
-    }
-    
-    func addMinivan(_ car: Minivan) {
-        minivanCars.append(car)
-    }
-    
-    func addPickup(_ car: PickUp) {
-        pickupCars.append(car)
-    }
-    
-    func addSportcar(_ car: SportCar) {
-        sportCars.append(car)
-    }
-    
-    func addSupercar(_ car: SuperCar) {
-        superCars.append(car)
-    }
     
     func getCars() -> [CarProtocol] {
         let carList: [CarProtocol] = sedanCars + minivanCars + pickupCars + sportCars + superCars
@@ -175,5 +135,49 @@ extension Diller: DelegateProtocol {
         sportCars.removeAll()
         superCars.removeAll()
         return carList
+    }
+}
+
+
+extension Diller: FactoryDelegate {
+    
+    func factoryDidCreate(_ factory: Factory, _ cars: [Sedan]) {
+        cars.forEach({ car in
+            var dillerCar = car
+            dillerCar.factoryName = factory.factoryName
+            sedanCars.append(dillerCar)
+        })
+    }
+    
+    func factoryDidCreate(_ factory: Factory, _ cars: [Minivan]) {
+        cars.forEach({ car in
+            var dillerCar = car
+            dillerCar.factoryName = factory.factoryName
+            minivanCars.append(dillerCar)
+        })
+    }
+    
+    func factoryDidCreate(_ factory: Factory, _ cars: [PickUp]) {
+        cars.forEach({ car in
+            var dillerCar = car
+            dillerCar.factoryName = factory.factoryName
+            pickupCars.append(dillerCar)
+        })
+    }
+    
+    func factoryDidCreate(_ factory: Factory, _ cars: [SportCar]) {
+        cars.forEach({ car in
+            var dillerCar = car
+            dillerCar.factoryName = factory.factoryName
+            sportCars.append(dillerCar)
+        })
+    }
+    
+    func factoryDidCreate(_ factory: Factory, _ cars: [SuperCar]) {
+        cars.forEach({ car in
+            var dillerCar = car
+            dillerCar.factoryName = factory.factoryName
+            superCars.append(dillerCar)
+        })
     }
 }

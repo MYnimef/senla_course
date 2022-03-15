@@ -8,7 +8,7 @@
 
 let factory = Factory(factoryName: "АВТОВАЗ")
 let diller = Diller()
-factory.setDelegate(diller)
+factory.delegate = diller
 
 factory.makeTomcat()
 factory.makeBMWX5()
