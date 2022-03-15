@@ -228,9 +228,9 @@ struct Minivan: CarProtocol, MinivanProtocol {
     var state: CarState = .settingUp
     var factoryName: String?
     
-    var familyMembersAmount: Int
-    var doesHaveDad: Bool
-    var doesHaveMom: Bool
+    var familyMembersAmount: Int = 0
+    var doesHaveDad: Bool = false
+    var doesHaveMom: Bool = false
 }
 
 

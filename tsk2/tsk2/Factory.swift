@@ -13,53 +13,107 @@ class Factory {
     private var sportCars: [SportCar] = []
     private var superCars: [SuperCar] = []
     
-    weak var dillerDelegate: Diller?
+    private weak var delegate: DelegateProtocol?
     
     let factoryName: String
     
-    init(factoryName: String, dillerDelegate: Diller) {
+    init(factoryName: String) {
         self.factoryName = factoryName
-        self.dillerDelegate = dillerDelegate
     }
-
-    func getCarsFromFactory() -> [CarProtocol] {
-        let carList: [CarProtocol] = sedanCars + minivanCars + pickupCars + sportCars + superCars
+    
+    func setDelegate(_ delegate: DelegateProtocol) {
+        sedanCars.forEach({ car in
+            delegate.addSedan(car)
+        })
         sedanCars.removeAll()
+        minivanCars.forEach({ car in
+            delegate.addMinivan(car)
+        })
         minivanCars.removeAll()
+        pickupCars.forEach({ car in
+            delegate.addPickup(car)
+        })
         pickupCars.removeAll()
+        sportCars.forEach({ car in
+            delegate.addSportcar(car)
+        })
         sportCars.removeAll()
+        superCars.forEach({ car in
+            delegate.addSupercar(car)
+        })
         superCars.removeAll()
-        return carList
+        self.delegate = delegate
     }
     
-    func makeCar(_ car: Sedan) {
-        var factoryCar = car
-        assemble(&factoryCar)
-        dillerDelegate?.addSedan(factoryCar)
+    func makeMercedes() {
+        var car = Sedan(
+            modelName: "Mercedes",
+            physicalSpecs: PhysicalCpecs(weight: 1500, width: 1816, length: 4351, height: 1816),
+            engine: Engine(name: "WRUM", maxSpeed: 120, velocity: 80),
+            gunsAmount: 5
+        )
+        assemble(&car)
+        if let dillerDelegate = delegate {
+            dillerDelegate.addSedan(car)
+        } else {
+            sedanCars.append(car)
+        }
     }
     
-    func makeCar(_ car: Minivan) {
-        var factoryCar = car
-        assemble(&factoryCar)
-        dillerDelegate?.addMinivan(factoryCar)
+    func makeHondaOdyssey() {
+        var car = Minivan(
+            modelName: "Honda odyssey",
+            physicalSpecs: PhysicalCpecs(weight: 15000, width: 18160, length: 43510, height: 18160),
+            engine: Engine(name: "FURICH", maxSpeed: 100, velocity: 70)
+        )
+        assemble(&car)
+        if let dillerDelegate = delegate {
+            dillerDelegate.addMinivan(car)
+        } else {
+            minivanCars.append(car)
+        }
     }
     
-    func makeCar(_ car: PickUp) {
-        var factoryCar = car
-        assemble(&factoryCar)
-        dillerDelegate?.addPickup(factoryCar)
+    func makeTomcat() {
+        var car = PickUp(
+            modelName: "Tomcat",
+            physicalSpecs: PhysicalCpecs(weight: 15000, width: 18160, length: 43510, height: 18160),
+            engine: Engine(name: "FURICH", maxSpeed: 100, velocity: 70)
+        )
+        assemble(&car)
+        if let dillerDelegate = delegate {
+            dillerDelegate.addPickup(car)
+        } else {
+            pickupCars.append(car)
+        }
     }
     
-    func makeCar(_ car: SportCar) {
-        var factoryCar = car
-        assemble(&factoryCar)
-        dillerDelegate?.addSportcar(factoryCar)
+    func makeAudiS3() {
+        var car = SportCar(
+            modelName: "Audi S3 Sportback",
+            physicalSpecs: PhysicalCpecs(weight: 1500, width: 1816, length: 4351, height: 1816),
+            engine: Engine(name: "TFSI", maxSpeed: 150, velocity: 90)
+        )
+        assemble(&car)
+        if let dillerDelegate = delegate {
+            dillerDelegate.addSportcar(car)
+        } else {
+            sportCars.append(car)
+        }
     }
     
-    func makeCar(_ car: SuperCar) {
-        var factoryCar = car
-        assemble(&factoryCar)
-        dillerDelegate?.addSupercar(factoryCar)
+    func makeBMWX5() {
+        var car = SuperCar(
+            modelName: "BMW X5",
+            physicalSpecs: PhysicalCpecs(weight: 1550, width: 1806, length: 4651, height: 1916),
+            engine: Engine(name: "XXXI", maxSpeed: 200, velocity: 100)
+        )
+        assemble(&car)
+        if let dillerDelegate = delegate {
+            dillerDelegate.addSupercar(car)
+        } else {
+            superCars.append(car)
+        }
     }
     
     private func assemble<T: CarProtocol>(_ car: inout T) {
@@ -70,7 +124,7 @@ class Factory {
 }
 
 
-protocol DillerProtocol: AnyObject {
+protocol DelegateProtocol: AnyObject {
     
     func getCars() -> [CarProtocol]
     func addSedan(_ car: Sedan)
@@ -91,7 +145,7 @@ class Diller {
 }
 
 
-extension Diller: DillerProtocol {
+extension Diller: DelegateProtocol {
     
     func addSedan(_ car: Sedan) {
         sedanCars.append(car)
